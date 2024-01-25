@@ -1,0 +1,43 @@
+service: document
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:us-east-2:943766074476:table/documentsTable
+
+functions:
+  documentCreate:
+    handler: src/documentCreate.documentCreate
+    events:
+      - httpApi:
+          path: /document/create
+          method: post
+  documentDelete:
+    handler: src/documentDelete.documentDelete
+    events:
+      - httpApi:
+          path: /document/delete
+          method: post
+
+resources:
+  Resources:
+    documentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: documentsTable
+        AttributeDefinitions:
+          - AttributeName: idDocument
+            AttributeType: S
+        KeySchema:
+          - AttributeName: idDocument
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
